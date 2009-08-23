@@ -1,0 +1,29 @@
+.Dd $Mdocdate: November 29 2007 $
+.Dt RCRON 8
+.Os
+.Sh NAME
+.Nm rcron
+.Nd
+.Tn Helper
+for cron jobs redundancy and failover.
+.Sh SYNOPSIS
+.Nm rcron
+.Op Fl -conf Ar config_file
+.Sh DESCRIPTION
+.Nm
+helps to manage cron jobs failover.
+.Pp
+The options are as follows:
+.Bl -tag -width Ds
+.It Fl -conf Ar config_file
+Specify an alternative configuration file path.
+.El
+.Sh SEE ALSO
+.Xr cron 8 ,
+.Xr crontab 1 ,
+.Sh HISTORY
+The
+.Nm
+command appeared in 2009.
+.Sh BUGS
+No known bugs yet.

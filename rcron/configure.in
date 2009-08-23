@@ -1,0 +1,22 @@
+# Process this file with autoconf to produce a configure script.
+# (autheader to regenerate config.h.in)
+
+AC_INIT(src/rcron_conf.h)
+AM_INIT_AUTOMAKE(rcron, 0.1.0)
+
+AC_CONFIG_HEADERS([src/config.h])
+
+AC_PROG_CC
+AC_PROG_YACC
+AM_PROG_LEX
+
+AC_HEADER_STDC
+AC_CHECK_HEADERS([errno.h libgen.h string.h stdarg.h syslog.h time.h sys/time.h sys/resource.h])
+
+AC_CHECK_LIB(fl, yywrap)
+
+AC_CHECK_FUNCS([basename openlog setpriority strdup syslog system time],,
+               [AC_MSG_ERROR([ not found - aborting!])])
+
+AC_OUTPUT(Makefile src/Makefile)
+

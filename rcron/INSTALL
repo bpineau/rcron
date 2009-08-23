@@ -1,0 +1,9 @@
+
+To regenerate autohell things (facultative):
+aclocal ; automake [--add-missing] ;  autoconf
+
+To build (example):
+aptitude install flex bison build-essential libc6-dev
+./configure --prefix=/usr --sysconfdir=/etc
+make
+
