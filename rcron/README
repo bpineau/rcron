@@ -1,44 +1,69 @@
+rcron is a minimal tool to provide cron jobs redundancy and failover over groups of machines, by ensuring that a job installed on several machines will only run on the "active" one at any time.
 
-rcron is a minimal tool to ensure cron jobs redundancy and failover
-over groups of machines.
+== Using rcron ==
+The usage is very simple:
+  # Install rcron on servers sharing a common group of jobs (the "cluster").
+  # Write a rcron configuration file on each server. For instance :
+    * /etc/rcron/rcron.conf on server1:
+    {{{
+    # An arbitrary name
+    cluster_name        = myredundant_jobs
+    # A file containing either the word "active" or the word "passive"
+    state_file          = /var/run/rcron/state
+    # The default state in case state_file can't be read
+    default_state       = active
+    syslog_facility     = LOG_CRON
+    syslog_level        = LOG_INFO
+    # We can tune jobs niceness/priorities (see nice(1)).
+    nice_level          = 19
+    }}}
+    * /etc/rcron/rcron.conf on server2:
+    {{{
+    cluster_name        = myredundant_jobs
+    state_file          = /var/run/rcron/state
+    default_state       = passive
+    syslog_facility     = LOG_CRON
+    syslog_level        = LOG_INFO
+    nice_level          = 19
+    }}}
+  # On all cluster servers, edit your crontabs, and for every cron job you want redundant, prefix job definition with rcron. For instance:
+  {{{
+  12 11 * * * /usr/bin/rcron myjob
+  }}}
+  # Configure an external tool like keepalived, heartbeat or wackamole to maintain the configured state_file up to date: on the master server, this file must contain the word "active", and on slaves servers, the word "passive".
 
-The principle is: cron jobs needing redundancy are launched by rcron (just
-prefix "rcron" to the job command line in crontab for this). When launched,
-rcron will look the content of a state file, which should be "active" (then
-rcron will actually run the command) or "passive" (then rcron will return
-immediatly).
+== Principles ==
+Cron jobs needing redundancy are launched by rcron (just prefix "rcron" to the job 
+command line in crontab for this). When triggered by cron deamon, rcron will look 
+at a state file, which should contains either "active" (then rcron will 
+actually run the command) or "passive" (then rcron will return immediately).
 
 rcron doesn't guess the machines state (active/passive, aka master/slave) by
 itself, but rely on external tools like keepalived or heartbeat or wackamole
 to do this for him and to update his state file. It doesn't synchronize 
 crontabs by itself (do it manually for the jobs need high availability). 
-And it doesn't synchronize any data or code needed to run the jobs amon
+And it doesn't synchronize any data or code needed to run the jobs amon 
 servers (this can be done independantly with NFS, SMB, Csync2, etc.).
 
-The usage is very simple:
-# Install rcron on a group of servers sharing a common group of jobs (the "cluster").
-# Write a rcron configuration file on each server. For instance :
-  * /etc/rcron/rcron.conf on server1:
-    # An arbitrary name (but common for a cluster)
-    cluster_name 	= myredundant_jobs
-    # A file containing either the word "active" or "passive"
-    state_file 		= /var/run/rcron/state
-    # The default state in case state_file can't be read
-    default_state 	= active
-    syslog_facility 	= LOG_CRON
-    syslog_level 	= LOG_INFO
-    nice_level 		= 19
-  * /etc/rcron/rcron.conf on server1:
-    cluster_name 	= myredundant_jobs
-    state_file 		= /var/run/rcron/state
-    default_state 	= passive
-    syslog_facility 	= LOG_CRON
-    syslog_level 	= LOG_INFO
-    nice_level 		= 19
-# On all cluster servers, and for all cron jobs you want redundant, prefix job
-  definition with rcron in crontabs. For instance:
-  12 11 * * * /usr/bin/rcron myjob
-# Configure an external tool like keepalive, heartbeat or wackamole to
-  maintain the configured state_file up to date: on the master server, this
-  file must contain "active", on slaves servers, "passive".
+== Tips ==
+rcron doesn't prevent you to use traditional, local only cron jobs. Just don't prefix them with "rcron".
+
+For a given cluster, only one server can be active at any time, so the load won't be balanced. But you can define different "cluster_name" per server by using different config files for the various jobs. So "server1" can be active by default for jobs using "cluster1" while "server2" can be active for "cluster2" jobs (and both will still preempt other's jobs in case of other server failure).
+You would have then something like:
+  * On boths server (server1 and server2) crontabs:
+    {{{
+    12 11 * * * /usr/bin/rcron --conf /etc/rcron/rcronA.conf myjob1
+    14 11 * * * /usr/bin/rcron --conf /etc/rcron/rcronB.conf myjob2
+    }}}
+  * On boths servers /etc/rcron/rcronA.conf :
+    {{{
+    cluster_name = some_jobs
+    state_file = /var/run/rcron/stateA
+    }}}
+  * On boths servers /etc/rcron/rcronB.conf :
+    {{{
+    cluster_name = other_jobs
+    state_file = /var/run/rcron/stateB
+    }}}
+  * Then configure your HA daemon (keepalived or so) to have server1 default active for jobs group A and server2 default active for jobs group B.
 
