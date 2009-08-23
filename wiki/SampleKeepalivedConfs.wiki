@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary Sample keepalived configuration files to maintain state_file up to date.
 
 = Configurations examples =
 Sample configuration files to use keepalived to keep clusters state informations (state_file) up to date.
@@ -167,4 +167,3 @@ vrrp_instance VI_2 {
     notify_fault  "/bin/echo passive > /var/run/rcron/state_groupB"
 }
 }}}
-
