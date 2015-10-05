@@ -41,5 +41,5 @@ char *conffile;
 
 rconf *parse_conf(char *cfile);
 int    parse_state(rconf *cfg);
-void   yyerror (char *s);
+void   yyerror (const char *s);
 

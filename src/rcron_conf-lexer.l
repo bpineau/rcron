@@ -1,4 +1,5 @@
 %option nounput
+%option noyywrap
 %option yylineno
 %{
 #include "rcron_conf-parser.h"
@@ -47,7 +48,7 @@ separator	[\t =]+
 <<EOF>>				{ return 0 ; }
 %%
 
-void yyerror (char *s)
+void yyerror (const char *s)
 {
 	warning("%s line %i ('%s'): %s\n", conffile, lineno, yytext, s);
 	exit(1);

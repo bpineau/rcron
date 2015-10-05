@@ -1,0 +1,16 @@
+*.swo
+*.swp
+*.o
+*~
+src/rcron
+autom4te.cache
+Makefile
+config.log
+config.status
+src/.deps/
+src/Makefile
+src/config.h
+src/stamp-h1
+src/rcron_conf-lexer.c
+src/rcron_conf-parser.c
+src/rcron_conf-parser.h
