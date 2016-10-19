@@ -52,19 +52,19 @@ A typical setup would be:
 ```
 12 11 * * * /usr/bin/rcron myjob
 ```
-* Configure an external tool to maintain the configured state_file up to date: on the master server, this file must contain the word "active", and the word "passive" on slaves servers. See SampleKeepalivedConfs for instance.
+* Configure an external tool to maintain the configured state_file up to date: on the master server, this file must contain the word "active", and the word "passive" on slaves servers. See the [sample keepalived configurations](sample_keepalived_confs.md) for instance.
 
 ## Principles
 
-Cron jobs needing redundancy are launched by rcron rather than directly by cron. 
+Cron jobs needing redundancy are launched by rcron rather than directly by cron.
 When triggered by the cron deamon, rcron will look at his state file's content,
-looking for the words "active" or "passive": 
+looking for the words "active" or "passive":
 * active: rcron will actually run the command
 * passive: rcron will return immediately
 
 
 So rcron is a dumb tool with a K.I.S.S. design, and doesn't do much by itself:
-* It doesn't guess the machines states (active/passive, aka master/slave). It just rely on external tools (like keepalived or heartbeat or wackamole, or something depending on your business context) or manual interventions to update his state file's content. 
+* It doesn't guess the machines states (active/passive, aka master/slave). It just rely on external tools (like keepalived or heartbeat or wackamole, or something depending on your business context) or manual interventions to update his state file's content.
 * It doe not synchronize crontabs content by itself (do it manually for the jobs needing high availability).  
 * It does not synchronize any data or code needed to run the jobs (consider using NFS, ocfs2, csync2, or similar).
 * If an active server halt or crash while running a cron job, rcron won't transfer this job elsewhere nor relaunch it. But it does try to log enough informations so you can see which jobs got interrupted.
@@ -97,9 +97,8 @@ You would have then something like:
     cluster_name = other_jobs
     state_file = /var/run/rcron/stateB
 ```
-* Configure some HA daemon (keepalived or so) to keep server1 default active for the job group A and server2 active for the job group B. See "Multiple clusters setup" in SampleKeepalivedConfs.
+* Configure some HA daemon (keepalived or so) to keep server1 default active for the job group A and server2 active for the job group B. See "Multiple clusters setup" in the [sample keepalived configurations](sample_keepalived_confs.md).
 
 ## Authors
 
 Benjamin Pineau - ben |dot| pineau |at| gmail |dot| com
-
